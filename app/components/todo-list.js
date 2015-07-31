@@ -1,19 +1,24 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
-    actions: {
+  actions: {
+        clearCompleted: function() {
+        var completed = this.get('model').filterBy('isCompleted', true);
+        completed.invoke('deleteRecord');
+        completed.invoke('save');
+    },
         createTodo: function(newTitle) {
             this.set('newTitle', '');
             this.sendAction('createTodo', newTitle);
-        },
-        clearCompleted: function() {
-            var model = this.get('model');
-            var completed = model.filterBy('isCompleted', true);
-            console.log(completed);
-            completed.invoke('deleteRecord');
-            completed.invoke('save');
         }
     },
+    hasCompleted: Ember.computed('completed', function() {
+        return this.get('completed') > 0;
+    }),
+    completed: Ember.computed('model.@each.isCompleted', function() {
+        var model = this.get('model');
+        return model.filterBy('isCompleted', true).get('length');
+    }),
     remaining: Ember.computed('model.@each.isCompleted', function() {
         var model = this.get('model');
         return model.filterBy('isCompleted', false).get('length');
@@ -22,14 +27,7 @@ export default Ember.Component.extend({
         var remaining = this.get('remaining');
         return (remaining === 1) ? 'item' : 'items';
     }),
-    hasCompleted: Ember.computed('completed', function() {
-        return this.get('completed') > 0;
-    }),
-    completed: Ember.computed('model.@each.isCompleted', function() {
-        var model = this.get('model');
-        return model.filterBy('isCompleted', true).get('length');
-    }),
-    allAreDone: Ember.computed('model.@each.isCompleted', function(key, value) {
+    allAreDone: function(key, value) {
         var model = this.get('model');
         console.log(key + ": " + value);
         if (value === undefined) {
@@ -39,5 +37,5 @@ export default Ember.Component.extend({
             model.invoke('save');
             return value;
         }
-    })
+    }.property('@each.isCompleted')
 });
