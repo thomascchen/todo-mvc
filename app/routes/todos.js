@@ -13,7 +13,7 @@ export default Ember.Route.extend({
             });
 
             // Clear the "New Todo" text field
-            this.controllerFor('todos').set('newTitle', '');
+            // this.controllerFor('todos').set('newTitle', '');
 
             // Save the new model
             todo.save();
